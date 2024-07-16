@@ -903,7 +903,7 @@ class NanInfMetricMsg : public MetricMsg {
     calculator = new BasicAucCalculator(mode_collect_in_gpu);
     calculator->init(bucket_size);
   }
-  virtual ~NanInfMetricMsg() { } 
+  virtual ~NanInfMetricMsg() { }
   void add_data(const Scope* exe_scope,
                 const paddle::platform::Place& place) override {
     int label_len = 0;
@@ -921,7 +921,7 @@ class NanInfMetricMsg : public MetricMsg {
     auto cal = GetCalculator();
     auto pre_var_place = GetVarPlace(exe_scope, pred_varname_);
     auto label_var_place = GetVarPlace(exe_scope, label_varname_);
-    cal->add_nan_inf_data( 
+    cal->add_nan_inf_data(
         pred_data, label_data, label_len, pre_var_place, label_var_place);
   }
 };
@@ -1115,8 +1115,8 @@ const std::vector<double> BoxWrapper::GetNanInfMetricMsg(
   std::vector<double> metric_return_values_(4, 0.0);
   auto* naninf_cal_ = iter->second->GetCalculator();
   naninf_cal_->computeNanInfMsg();
-  metric_return_values_[0] = naninf_cal_->nan_rate();
-  metric_return_values_[1] = naninf_cal_->inf_rate();
+  metric_return_values_[0] = naninf_cal_->nan_cnt();
+  metric_return_values_[1] = naninf_cal_->inf_cnt();
   metric_return_values_[2] = naninf_cal_->nan_inf_rate();
   metric_return_values_[3] = naninf_cal_->size();
   naninf_cal_->reset_nan_inf();
@@ -1160,13 +1160,6 @@ void BoxWrapper::PrintSyncTimer(int device, double train_span) {
                << ", dense nccl:" << dev.dense_nccl_timer.ElapsedSec()
                << ", sync stream:" << dev.dense_sync_timer.ElapsedSec()
                << ", wrapper xpu memory:" << dev.GpuMemUsed() << "MB";
-  
-  auto env_str = std::getenv("ENABLE_FC_HIT_RATE");
-  if (env_str != nullptr && (strcmp(env_str, "true") == 0 || strcmp(env_str, "1") == 0)) {
-    auto place = platform::XPUPlace(device);
-    auto xpu_context = static_cast<platform::XPUDeviceContext*>(platform::DeviceContextPool::Instance().Get(place))->x_context();
-    LOG(INFO) << "xpu: " << device << ", fc_hit_rate: " << xpu_context->get_fc_hit_rate();
-  }
 #else
   LOG(WARNING) << "cpu: " << device << ", phase: " << phase_
                << ", train dnn: " << train_span

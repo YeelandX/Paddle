@@ -35,7 +35,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${LINK_FLAGS}")
 
 if(NOT XPU_TOOLCHAIN)
   #set(XPU_TOOLCHAIN /workspace/output/XTDK-ubuntu_x86_64)
-  set(XPU_TOOLCHAIN ${PROJECT_BINARY_DIR}/third_party/xpu/src/extern_xpu/output/xtdk-centos7_x86_64_gcc8u3)
+  set(XPU_TOOLCHAIN ${PROJECT_BINARY_DIR}/third_party/xpu/src/extern_xpu/xtdk-llvm15-bdcentos7_x86_64)
   # set(XPU_TOOLCHAIN /home/work/xtdk/XTDK-centos7_GCC8u3)
   #set(XPU_TOOLCHAIN /home/work/xtdk/XTDK-bdcentos_x86_64)
   #set(XPU_TOOLCHAIN /home/work/xtdk/XTDK-centos_GCCABI1_x86_64)
@@ -81,7 +81,7 @@ set(TOOLCHAIN_ARGS)
 if(OPT_LEVEL)
   set(OPT_LEVEL ${OPT_LEVEL})
 else()
-  set(OPT_LEVEL "-O3")
+  set(OPT_LEVEL "-O2")
 endif()
 
 message(STATUS "Build with API_ARCH=" ${API_ARCH})
@@ -199,7 +199,7 @@ macro(compile_kernel COMPILE_ARGS)
     COMMAND ${CMAKE_COMMAND} -E make_directory kernel_build
     COMMAND
       ${XPU_CLANG} --sysroot=${CXX_DIR} -std=c++11 ${ABI_VERSION} ${OPT_LEVEL}
-      -fno-builtin --xpu-arch=xpu2 -fPIC ${XPU_CXX_DEFINES} ${XPU_CXX_FLAGS}
+      -fno-builtin -fxpu-launch-return --xpu-arch=xpu2 -fPIC ${XPU_CXX_DEFINES} ${XPU_CXX_FLAGS}
       ${XPU_CXX_INCLUDES} -I. -o kernel_build/${kernel_name}.bin.o.sec
       kernel_build/${kernel_name}.xpu --xpu-device-only -c -v
     COMMAND ${XTDK_DIR}/bin/xpu2-elfconv kernel_build/${kernel_name}.bin.o.sec
@@ -215,7 +215,7 @@ macro(compile_kernel COMPILE_ARGS)
     COMMAND ${CMAKE_COMMAND} -E make_directory kernel_build
     COMMAND
       ${XPU_CLANG} --sysroot=${CXX_DIR} -std=c++11 ${ABI_VERSION} ${OPT_LEVEL}
-      -fno-builtin --xpu-arch=xpu2 -fPIC ${XPU_CXX_DEFINES} ${XPU_CXX_FLAGS}
+      -fno-builtin -fxpu-launch-return --xpu-arch=xpu2 -fPIC ${XPU_CXX_DEFINES} ${XPU_CXX_FLAGS}
       ${XPU_CXX_INCLUDES} -I. -o kernel_build/${kernel_name}.host.o
       kernel_build/${kernel_name}.xpu --xpu-host-only -c -v
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
